@@ -71,7 +71,7 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 
 		r1=rand() %8+1;
 		r2=rand() %8+1;
-		while(r1<1 || r1>8 || r2<1 || r2>8)
+		while(r1<1 || r1>8 || r2<1 || r2>8 || r1==r2)
 			r2=rand() %9+1;
 
 		tmp=a[i].t[r1];
