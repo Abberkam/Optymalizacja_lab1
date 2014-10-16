@@ -6,6 +6,9 @@
 using namespace std;
 
 int ile=10000;							//ile tras podczasz szukania najkrótszej
+const char* f_in="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\exp0.txt";
+const char* f_out0="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_0.txt";
+const char* f_out1="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_1.txt";
 
 struct trasa{
 	int t[10];
@@ -46,7 +49,7 @@ int dlugoscTrasy(int n, int **d, int *t)
 	//cout<<"Dlugosc trasy wynosi: "<<suma<<endl;
 
 	FILE *w;
-	fopen_s(&w,"C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_0.txt", "w");
+	fopen_s(&w,f_out0, "w");
 	fprintf(w,"%i",suma);
 	fclose(w);
 
@@ -80,7 +83,7 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 
 	struct trasa temp;
 	temp.suma=a[0].suma;
-	int min;
+	int min=1;
 	for(i=1;i<ile;i++)
 	{
 		if(a[i].suma<temp.suma)
@@ -93,7 +96,7 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 		temp.t[i]=a[min].t[i];
 
 	FILE *w;
-	fopen_s(&w,"C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_1.txt", "w");
+	fopen_s(&w,f_out1, "w");
 	fprintf(w,"Najkrótsza trasa ma:\nd³ugoœæ: %i i drogê: ",temp.suma);
 	for(i=0;i<n+1;i++)
 		fprintf(w,"%i ",temp.t[i]);
@@ -114,7 +117,7 @@ int main()
 {
 	int n;
 	FILE *f;
-	fopen_s(&f,"C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\exp0.txt", "rt");
+	fopen_s(&f,f_in, "rt");
 	fscanf_s(f,"%i",&n);
 
 	int ** d = new int * [n];
