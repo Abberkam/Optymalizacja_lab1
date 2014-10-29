@@ -5,11 +5,12 @@
 
 using namespace std;
 
-int ile=10000;							//ile tras podczasz szukania najkrótszej
+int ile=100000;							//ile tras podczasz szukania najkrótszej
 const char* f_in="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\exp0.txt";
 const char* f_out0="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_0.txt";
 const char* f_out1="C:\\Users\\abberkam\\Source\\Repos\\Optymalizacja\\wynik0_1.txt";
 
+//struktura przechowuj¹ca trasê i jej d³ugoœæ
 struct trasa{
 	int t[10];
 	int suma;
@@ -47,12 +48,6 @@ int dlugoscTrasy(int n, int **d, int *t)
 		//cout<<t[i-1]<<" do "<<t[i]<<" "<<d[t[i-1]][t[i]]<<endl;
 	}
 	//cout<<"Dlugosc trasy wynosi: "<<suma<<endl;
-
-	FILE *w;
-	fopen_s(&w,f_out0, "w");
-	fprintf(w,"%i",suma);
-	fclose(w);
-
 	return suma;
 }
 
@@ -61,18 +56,21 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 	srand((unsigned int)time(NULL));
 	int i, j, r1, r2=0, tmp;
 
-	for(i=0; i<ile; i++)
+	for(j=0; j<n+1; j++)
 	{
-		a[i].suma=0;
+		a[0].t[j]=t[j];
+	}
+	a[0].suma=dlugoscTrasy(n,d,a[0].t);
+
+	for(i=1; i<ile; i++)
+	{
 		for(j=0; j<n+1; j++)
 		{
-			a[i].t[j]=t[j];
+			a[i].t[j]=a[i-1].t[j];
 		}
 
 		r1=rand() %8+1;
 		r2=rand() %8+1;
-		while(r1<1 || r1>8 || r2<1 || r2>8 || r1==r2)
-			r2=rand() %9+1;
 
 		tmp=a[i].t[r1];
 		a[i].t[r1]=a[i].t[r2];
@@ -83,7 +81,7 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 
 	struct trasa temp;
 	temp.suma=a[0].suma;
-	int min=1;
+	int min;
 	for(i=1;i<ile;i++)
 	{
 		if(a[i].suma<temp.suma)
@@ -97,9 +95,14 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 
 	FILE *w;
 	fopen_s(&w,f_out1, "w");
-	fprintf(w,"Najkrótsza trasa ma:\nd³ugoœæ: %i i drogê: ",temp.suma);
+	fprintf(w,"Najkrótsza trasa ma:\nd³ugoœæ: %i i kolejnoœæ: ",temp.suma);
+	cout<<"Najkrótsza trasa ma d³ugoœæ: "<<temp.suma<<","<<endl<<"kolejnoœæ odwiedzania miast to: ";
 	for(i=0;i<n+1;i++)
+	{
 		fprintf(w,"%i ",temp.t[i]);
+		cout<<temp.t[i]<<" ";
+	}
+	cout<<endl;
 	fprintf(w,"\n\nDANE:\n");
 	for(i=0;i<ile;i++)
 	{
@@ -115,22 +118,26 @@ void szukajDrogi(struct trasa *a, int ile, int n, int **d, int *t)
 
 int main()
 {
-	int n;
+	setlocale(LC_ALL,"polish");
+	int n;								//liczba miast
 	FILE *f;
-	fopen_s(&f,f_in, "rt");
-	fscanf_s(f,"%i",&n);
+	fopen_s(&f,f_in, "rt");				//otwarcie pliku z danymi
+	fscanf_s(f,"%i",&n);				//pobranie liczby miast
 
-	int ** d = new int * [n];
+	int ** d = new int * [n];			//tablica odleg³oœæi pomiêdzy miastami
 	for (int i = 0; i<n; i++)
 		d[i] = new int [n];
-	int * t = new int[n];
+	int * t = new int[n];				//wektor kolejnoœci odwiedzania miast
 
-	wczytajDane(f,n,d,t);				//zamyka plik f
+	wczytajDane(f,n,d,t);				//wcztuje dane i zamyka plik f
 
-	dlugoscTrasy(n,d,t);				//zapisuje wynik do pliku wynik0_0.txt
+	FILE *w;							//liczy d³ugoœæ trasy t i zapisuje wynik do pliku wynik0_0.txt
+	fopen_s(&w,f_out0, "w");
+	fprintf(w,"%i",dlugoscTrasy(n,d,t));
+	fclose(w);
 
-	struct trasa *a= new struct trasa [ile];
-	szukajDrogi(a,ile,n,d,t);			//zapisuje wynik do pliku wynik0_1.txt
+	struct trasa *a= new struct trasa [ile];		//tablica struktur
+	szukajDrogi(a,ile,n,d,t);			//liczy d³ugoœci tras dla zamiany 2 dowolnych miast na trasie i zapisuje wynik do pliku wynik0_1.txt
 
 	system("PAUSE");
 	return 0;
